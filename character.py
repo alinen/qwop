@@ -61,16 +61,16 @@ class Character:
             sprite.body.position = sprite.body.start_position
             sprite.body.angle = 0
 
-    def move_thighL(self, force=90):
+    def move_thighL(self, force=90000):
         self.thighL.apply_impulse_at_local_point((force, 0), (0, 0))
 
-    def move_thighR(self, force):
+    def move_thighR(self, force=90000):
         self.thighR.apply_impulse_at_local_point((force, 0), (0, 0))
 
-    def move_calfL(self, force):
+    def move_calfL(self, force=90000):
         self.calfL.apply_impulse_at_local_point((-force, 0), (0, 0))
 
-    def move_calfR(self, force):
+    def move_calfR(self, force=90000):
         self.calfR.apply_impulse_at_local_point((-force, 0), (0, 0))
 
     def init_pose(self):

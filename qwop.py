@@ -15,8 +15,6 @@ pDown = False
 paused = True
 debug_draw = True
 
-camera_leftCorner = 0
-
 @window.event
 def on_key_release(symbol, modifiers):
     global qDown
@@ -44,7 +42,7 @@ def on_key_press(symbol, modifiers):
     if symbol == key.ESCAPE:
         window.close()
     elif symbol == key.R:
-        reset()
+        character.reset()
     elif symbol == key.Q:
         qDown = True
     elif symbol == key.W:
@@ -63,7 +61,9 @@ def on_key_press(symbol, modifiers):
 def draw_rect(h1, h2, c1, c2):
     w = window.width
     h = window.height
-    background = (camera_leftCorner, h*h1, w-camera_leftCorner, h*h1, w,h*h2, 0, h*h2)
+
+    lc = character.get_position()[0] - w//2
+    background = (lc, h*h1, w+lc, h*h1, w+lc, h*h2, lc, h*h2)
     colors = (c1[0],c1[1],c1[2],c1[3], 
               c1[0],c1[1],c1[2],c1[3], 
               c2[0],c2[1],c2[2],c2[3], 
@@ -99,13 +99,14 @@ def on_draw():
 
     w = window.width
     h = window.height
+    lc = character.get_position()[0] - w//2
 
     pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
     pyglet.gl.glBlendFunc(pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA)
 
     pyglet.gl.glMatrixMode(pyglet.gl.GL_PROJECTION)
     pyglet.gl.glLoadIdentity()
-    pyglet.gl.glOrtho(camera_leftCorner, w - camera_leftCorner, 0, h, -1, 1)
+    pyglet.gl.glOrtho(lc, lc+w, 0, h, -1, 1)
     pyglet.gl.glMatrixMode(pyglet.gl.GL_MODELVIEW)
 
     #pyglet.gl.glColor3f(.8,.8,.0)
@@ -156,7 +157,7 @@ def setup_world():
     handler.begin = hit_ground
 
     floorHeight = 10
-    floor = pymunk.Segment(space.static_body, Vec2d(-window.width,floorHeight), Vec2d(window.width*2,10), 1)
+    floor = pymunk.Segment(space.static_body, Vec2d(-window.width*100,floorHeight), Vec2d(window.width*100,10), 1)
     floor.friction = 0.3
     floor.collision_type = 100
     space.add(floor)
