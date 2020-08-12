@@ -16,6 +16,8 @@ oDown = False
 pDown = False
 paused = True
 
+camera_leftCorner = 0
+
 def reset():
     for body in space.bodies:
         body.position = body.start_position
@@ -60,21 +62,68 @@ def on_key_press(symbol, modifiers):
         step()
     elif symbol == key.SPACE:
         paused = not paused
-        
+
+def draw_rect(h1, h2, c1, c2):
+    w = window.width
+    h = window.height
+    background = (camera_leftCorner, h*h1, w-camera_leftCorner, h*h1, w,h*h2, 0, h*h2)
+    colors = (c1[0],c1[1],c1[2],c1[3], 
+              c1[0],c1[1],c1[2],c1[3], 
+              c2[0],c2[1],c2[2],c2[3], 
+              c2[0],c2[1],c2[2],c2[3])
+    pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', background), ('c4B', colors))
+
+def draw_white_line(h):
+    draw_rect(h, h+0.01, (255,255,255,255), (255,255,255,100))
+    draw_rect(h-0.01, h, (255,255,255,100), (255,255,255,255))
+
+def draw_start():
+    w = window.width/2
+    h = window.height
+    
+    w1 = 25
+    w2 = 12.5
+    line = (w-w1, 10/h,  w+w1, 10/h, w+w2, h*0.28, w-w2, h*0.28)
+    colors = (255,255,255,255, 
+              255,255,255,255, 
+              255,255,255,200, 
+              255,255,255,200)
+    pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', line), ('c4B', colors))
+
+
 @window.event
 def on_draw():
     window.clear()
+
+    w = window.width
+    h = window.height
+
+    pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
+    pyglet.gl.glBlendFunc(pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA)
+
     pyglet.gl.glMatrixMode(pyglet.gl.GL_PROJECTION)
     pyglet.gl.glLoadIdentity()
-    pyglet.gl.glOrtho(0, 680, 0, 480, -1, 1)
-    glMatrixMode(pyglet.gl.GL_MODELVIEW)
+    pyglet.gl.glOrtho(camera_leftCorner, w - camera_leftCorner, 0, h, -1, 1)
+    pyglet.gl.glMatrixMode(pyglet.gl.GL_MODELVIEW)
+
+    #pyglet.gl.glColor3f(.8,.8,.0)
+    #pyglet.gl.glPointSize(10)
+    #pyglet.graphics.draw(2, pyglet.gl.GL_POINTS, ('v2f',[0,0, 0, 100]))
+
+    draw_rect(0.5, 1.0, (0,0,255,255), (0,0,50,255))
+    draw_rect(0.45, 0.5, (0,200,0,255), (0,0,255,255))
+    draw_rect(0.45, 0.35, (0,200,0,255), (0,200,0,255))
+    draw_rect(0.35, 0.25, (0,200,0,255), (200,0,0,255))
+    draw_rect(10/h, 0.25, (200,0,0,255), (200,0,0,255))
+    draw_white_line(0.1)
+    draw_white_line(0.2)
+    draw_white_line(0.25)
+    draw_white_line(0.28)
+    draw_start()
+
     fps_display.draw()
     options = pymunk.pyglet_util.DrawOptions()
     space.debug_draw(options)
-
-    pyglet.gl.glColor3f(.8,.8,.0)
-    pyglet.gl.glPointSize(10)
-    pyglet.graphics.draw(2, pyglet.gl.GL_POINTS, ('v2f',[0,0, 0, 100]))
 
 def step():
     for x in range(10):
