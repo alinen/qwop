@@ -82,13 +82,19 @@ def draw_start():
     h = window.height
     
     w1 = 25
-    w2 = 12.5
-    line = (w-w1, 10/h,  w+w1, 10/h, w+w2, h*0.28, w-w2, h*0.28)
-    colors = (255,255,255,255, 
+    w2 = 10
+    line1 = (w-w1, 10/h,  w, 10/h, w, h*0.28, w-w2, h*0.28)
+    line2 = (w, 10/h,  w+w1, 10/h, w+w2, h*0.28, w, h*0.28)
+    color1 = (255,255,255,50, 
               255,255,255,255, 
-              255,255,255,200, 
-              255,255,255,200)
-    pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', line), ('c4B', colors))
+              255,255,255,255, 
+              255,255,255,50)
+    color2 = (255,255,255,255, 
+              255,255,255,50, 
+              255,255,255,50, 
+              255,255,255,255)
+    pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', line1), ('c4B', color1))
+    pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', line2), ('c4B', color2))
 
 
 @window.event
