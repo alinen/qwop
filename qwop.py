@@ -14,10 +14,12 @@ qDown = False
 wDown = False
 oDown = False
 pDown = False
+paused = True
 
 def reset():
     for body in space.bodies:
         body.position = body.start_position
+        body.angle = 0
 
 @window.event
 def on_key_release(symbol, modifiers):
@@ -40,10 +42,11 @@ def on_key_press(symbol, modifiers):
     global wDown
     global oDown
     global pDown
+    global paused
     qDown = wDown = oDown = pDown = False
     if symbol == key.ESCAPE:
         window.close()
-    elif symbol == key.SPACE:
+    elif symbol == key.R:
         reset()
     elif symbol == key.Q:
         qDown = True
@@ -55,6 +58,8 @@ def on_key_press(symbol, modifiers):
         pDown = True
     elif symbol == key.S:
         step()
+    elif symbol == key.SPACE:
+        paused = not paused
         
 @window.event
 def on_draw():
@@ -84,7 +89,9 @@ def update(dt):
         calfL.apply_impulse_at_local_point((-90, 0), (0, 0))
     elif pDown:
         calfR.apply_impulse_at_local_point((-90, 0), (0, 0))
-    #step()
+
+    if not paused:
+       step()
 
 def setup_space():
     space = pymunk.Space()
@@ -92,7 +99,7 @@ def setup_space():
     space.damping = 0.99
     return space
 
-def setup_body(space, centerx, centery, mass, width, height, groupId = 1):
+def setup_body(space, centerx, centery, mass, width, height, collisionType, groupId = 1):
     moment = pymunk.moment_for_box(mass, (width, height))
     body = pymunk.Body(mass, moment)
     body.position = centerx, centery
@@ -102,16 +109,25 @@ def setup_body(space, centerx, centery, mass, width, height, groupId = 1):
     
     shape = pymunk.Poly.create_box(body, (width, height))
     shape.friction = 0.3
+    shape.collision_type = collisionType
     shape.filter = pymunk.ShapeFilter(group=1)
     shape.group = groupId
     space.add(body, shape)
     return body
 
+def hit_ground(arbiter, space, data):
+    print("hit ground!")
+    return True
+
 def setup_character(space):
+
+    handler = space.add_collision_handler(100, 1)
+    handler.begin = hit_ground
 
     floorHeight = 10
     floor = pymunk.Segment(space.static_body, Vec2d(-window.width,floorHeight), Vec2d(window.width*2,10), 1)
     floor.friction = 0.3
+    floor.collision_type = 100
     space.add(floor)
 
     mass = 10
@@ -122,17 +138,16 @@ def setup_character(space):
 
     global thighL, thighR, calfL, calfR
 
-    torso = setup_body(space, bodyx+0, bodyy+h*3/8, mass*2, w, h*3/4, 2)
+    torso = setup_body(space, bodyx+0, bodyy+h*3/8, mass*2, w, h*3/4, 1, 2)
 
-    thighL = setup_body(space, bodyx-w/4.0, bodyy-h/4.0, mass, w/2.0, h/2.0)
-    thighR = setup_body(space, bodyx+w/4.0, bodyy-h/4.0, mass, w/2.0, h/2.0)
+    thighL = setup_body(space, bodyx-w/4.0, bodyy-h/4.0, mass, w/2.0, h/2.0, 2)
+    thighR = setup_body(space, bodyx+w/4.0, bodyy-h/4.0, mass, w/2.0, h/2.0, 2)
 
-    calfL = setup_body(space, bodyx-w/4.0, bodyy-h*3/4.0, mass, w/2.0, h/2.0)
-    calfR = setup_body(space, bodyx+w/4.0, bodyy-h*3/4.0, mass, w/2.0, h/2.0)
+    calfL = setup_body(space, bodyx-w/4.0, bodyy-h*3/4.0, mass, w/2.0, h/2.0, 2)
+    calfR = setup_body(space, bodyx+w/4.0, bodyy-h*3/4.0, mass, w/2.0, h/2.0, 2)
 
-    footL = setup_body(space, bodyx-w/4+w/8, bodyy-h*17/16, mass/2.0, w*3/4, h/8)
-    footR = setup_body(space, bodyx+w/4+w/8, bodyy-h*17/16, mass/2.0, w*3/4, h/8)
-
+    footL = setup_body(space, bodyx-w/4+w/8, bodyy-h*17/16, mass/2.0, w*3/4, h/8, 2)
+    footR = setup_body(space, bodyx+w/4+w/8, bodyy-h*17/16, mass/2.0, w*3/4, h/8, 2)
 
     torso_thighL = pymunk.PivotJoint(torso, thighL, (bodyx-w/4, bodyy))
     torso_thighR = pymunk.PivotJoint(torso, thighR, (bodyx+w/4, bodyy))
