@@ -6,6 +6,7 @@ from pyglet.window import key
 
 window = pyglet.window.Window()
 fps_display = pyglet.window.FPSDisplay(window=window)
+bodies = []
 thighL = None
 thighR = None
 calfL = None
@@ -15,6 +16,7 @@ wDown = False
 oDown = False
 pDown = False
 paused = True
+debug_draw = True
 
 camera_leftCorner = 0
 
@@ -45,6 +47,7 @@ def on_key_press(symbol, modifiers):
     global oDown
     global pDown
     global paused
+    global debug_draw
     qDown = wDown = oDown = pDown = False
     if symbol == key.ESCAPE:
         window.close()
@@ -62,6 +65,8 @@ def on_key_press(symbol, modifiers):
         step()
     elif symbol == key.SPACE:
         paused = not paused
+    elif symbol == key.D:
+        debug_draw = not debug_draw
 
 def draw_rect(h1, h2, c1, c2):
     w = window.width
@@ -78,13 +83,13 @@ def draw_white_line(h):
     draw_rect(h-0.01, h, (255,255,255,100), (255,255,255,255))
 
 def draw_start():
-    w = window.width/2
+    x = window.width/2
     h = window.height
     
     w1 = 25
     w2 = 10
-    line1 = (w-w1, 10/h,  w, 10/h, w, h*0.28, w-w2, h*0.28)
-    line2 = (w, 10/h,  w+w1, 10/h, w+w2, h*0.28, w, h*0.28)
+    line1 = (x-w1, 10/h,  x, 10/h, x, h*0.28, x-w2, h*0.28)
+    line2 = (x, 10/h,  x+w1, 10/h, x+w2, h*0.28, x, h*0.28)
     color1 = (255,255,255,50, 
               255,255,255,255, 
               255,255,255,255, 
@@ -95,7 +100,6 @@ def draw_start():
               255,255,255,255)
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', line1), ('c4B', color1))
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', line2), ('c4B', color2))
-
 
 @window.event
 def on_draw():
@@ -127,9 +131,15 @@ def on_draw():
     draw_white_line(0.28)
     draw_start()
 
-    fps_display.draw()
-    options = pymunk.pyglet_util.DrawOptions()
-    space.debug_draw(options)
+    if debug_draw:
+        fps_display.draw()
+        options = pymunk.pyglet_util.DrawOptions()
+        space.debug_draw(options)
+    else:
+        for graphic in bodies:
+            graphic.position = graphic.body.position
+            graphic.rotation = -graphic.body.angle * 180 / math.pi
+            graphic.draw()
 
 def step():
     for x in range(10):
@@ -187,6 +197,16 @@ def create_joint(space, b1, b2, px, py, lim1, lim2):
     b1_b2_limit = pymunk.RotaryLimitJoint(b1, b2, -math.pi/10, math.pi/10)
     space.add(b1_b2_limit)
 
+# https://pyglet.readthedocs.io/en/latest/modules/sprite.html
+def load_sprite(name, body):
+    image = pyglet.resource.image(name)                        
+    image.anchor_x = image.width // 2
+    image.anchor_y = image.height // 2
+    sprite = pyglet.sprite.Sprite(image)
+    sprite.scale = body.height / (image.height)
+    sprite.body = body
+    return sprite
+
 def setup_character(space):
 
     handler = space.add_collision_handler(100, 1)
@@ -204,10 +224,10 @@ def setup_character(space):
     bodyx = window.width // 2
     bodyy = floorHeight + h + h/8 + 10 # 10 = margin
 
-    global thighL, thighR, calfL, calfR
+    global thighL, thighR, calfL, calfR, bodies
 
     torso = setup_body(space, bodyx+0, bodyy+h*3/8, mass*2, w, h*3/4, 1, 2)
-    head = setup_body(space, bodyx+0, bodyy+h*7/8, mass/2.0, w/2, w, 1, 2)
+    head = setup_body(space, bodyx+0, bodyy+h*7/8, mass/2.0, w/2, h/4, 1, 2)
 
     thighL = setup_body(space, bodyx-w/4.0, bodyy-h/4.0, mass, w/2.0, h/2.0, 2)
     thighR = setup_body(space, bodyx+w/4.0, bodyy-h/4.0, mass, w/2.0, h/2.0, 2)
@@ -217,6 +237,16 @@ def setup_character(space):
 
     footL = setup_body(space, bodyx-w/4+w/8, bodyy-h*17/16, mass/2.0, w*3/4, h/8, 2)
     footR = setup_body(space, bodyx+w/4+w/8, bodyy-h*17/16, mass/2.0, w*3/4, h/8, 2)
+
+    # Order determines draw order
+    bodies = [load_sprite("thigh.png", thighR), 
+              load_sprite("calf.png", calfR), 
+              load_sprite("foot.png", footR), 
+              load_sprite("torso.png", torso), 
+              load_sprite("thigh.png", thighL), 
+              load_sprite("calf.png", calfL), 
+              load_sprite("foot.png", footL), 
+              load_sprite("head.png", head)]
 
     create_joint(space, torso,  head,   bodyx,       bodyy+h*3/4, -math.pi/10,  math.pi/10)
     create_joint(space, torso,  thighL, bodyx-w/4,   bodyy      , -math.pi*3/4, math.pi/2)
