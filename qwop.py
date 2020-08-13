@@ -7,6 +7,11 @@ from character import Character
 
 window = pyglet.window.Window()
 fps_display = pyglet.window.FPSDisplay(window=window)
+label = pyglet.text.Label('0 meters',
+                          font_name='Times New Roman',
+                          font_size=24,
+                          x=window.width//2, y=window.height*0.9,
+                          anchor_x='center', anchor_y='center')
 character = None
 qDown = False
 wDown = False
@@ -136,6 +141,14 @@ def on_draw():
         space.debug_draw(options)
     else:
         character.draw()
+
+    pyglet.gl.glMatrixMode(pyglet.gl.GL_PROJECTION)
+    pyglet.gl.glLoadIdentity()
+    pyglet.gl.glOrtho(0, w, 0, h, -1, 1)
+    pyglet.gl.glMatrixMode(pyglet.gl.GL_MODELVIEW)
+    factor = 1.25/200
+    label.text = "%.1f meters"%(lc * factor)
+    label.draw()
 
 def step():
     for x in range(10):
