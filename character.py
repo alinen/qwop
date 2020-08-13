@@ -23,14 +23,14 @@ class Character:
         footR = setup_body(space, bodyx+w/4+w/8, bodyy-h*17/16, mass/2.0, w*3/4, h/8, 2)
 
         # Order determines draw order
-        self.bodies = [load_sprite("hthigh.png", thighR), 
-                       load_sprite("hcalf.png", calfR), 
-                       load_sprite("hfoot.png", footR, (5, 0)), 
-                       load_sprite("htorso.png", torso, (30, 10)), 
-                       load_sprite("hthigh.png", thighL), 
-                       load_sprite("hcalf.png", calfL), 
-                       load_sprite("hfoot.png", footL, (5, 0)), 
-                       load_sprite("hhead.png", head, (0,40))]
+        self.bodies = [load_sprite("assets/hthigh.png", thighR), 
+                       load_sprite("assets/hcalf.png", calfR), 
+                       load_sprite("assets/hfoot.png", footR, (5, 0)), 
+                       load_sprite("assets/htorso.png", torso, (30, 10)), 
+                       load_sprite("assets/hthigh.png", thighL), 
+                       load_sprite("assets/hcalf.png", calfL), 
+                       load_sprite("assets/hfoot.png", footL, (5, 0)), 
+                       load_sprite("assets/hhead.png", head, (0,40))]
 
         create_joint(space, torso,  head,   bodyx,       bodyy+h*3/4, -math.pi/10,  math.pi/10)
         create_joint(space, torso,  thighL, bodyx-w/4,   bodyy      , -math.pi/10, math.pi/2)
