@@ -1,3 +1,8 @@
+"""
+alinen 2020
+QWOP clone written with pyglet and pymunk
+"""
+
 import math
 import pymunk, pymunk.pyglet_util
 from pymunk.vec2d import Vec2d

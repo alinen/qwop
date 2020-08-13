@@ -1,3 +1,8 @@
+"""
+alinen 2020
+Armless ragdoll character
+"""
+
 import math
 import pyglet
 import pymunk, pymunk.pyglet_util
