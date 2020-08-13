@@ -12,8 +12,8 @@ qDown = False
 wDown = False
 oDown = False
 pDown = False
-paused = True
-debug_draw = True
+paused = False
+debug_draw = False
 
 @window.event
 def on_key_release(symbol, modifiers):
@@ -57,6 +57,16 @@ def on_key_press(symbol, modifiers):
         paused = not paused
     elif symbol == key.D:
         debug_draw = not debug_draw
+
+def print_commands():
+    print("SPACE: Pause simulation")
+    print("S: Step simulation")
+    print("R: Reset character")
+    print("D: Toggle debug draw of physics objects")
+    print("Q: Apply force to left thigh")
+    print("W: Apply force to right thigh")
+    print("O: Apply force to left calf")
+    print("P: Apply force to right calf")
 
 def draw_rect(h1, h2, c1, c2):
     w = window.width
@@ -108,10 +118,6 @@ def on_draw():
     pyglet.gl.glLoadIdentity()
     pyglet.gl.glOrtho(lc, lc+w, 0, h, -1, 1)
     pyglet.gl.glMatrixMode(pyglet.gl.GL_MODELVIEW)
-
-    #pyglet.gl.glColor3f(.8,.8,.0)
-    #pyglet.gl.glPointSize(10)
-    #pyglet.graphics.draw(2, pyglet.gl.GL_POINTS, ('v2f',[0,0, 0, 100]))
 
     draw_rect(0.5, 1.0, (0,0,255,255), (0,0,50,255))
     draw_rect(0.45, 0.5, (0,200,0,255), (0,0,255,255))
@@ -176,6 +182,7 @@ def hit_ground(arbiter, space, data):
     print("hit ground!")
     return True
 
+print_commands()
 space = setup_world()
 pyglet.clock.schedule_interval(update, 0.01)
 pyglet.app.run()
