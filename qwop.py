@@ -158,7 +158,7 @@ def setup_world():
 
     floorHeight = 10
     floor = pymunk.Segment(space.static_body, Vec2d(-window.width*100,floorHeight), Vec2d(window.width*100,10), 1)
-    floor.friction = 0.3
+    floor.friction = 10.3
     floor.collision_type = 100
     space.add(floor)
 
