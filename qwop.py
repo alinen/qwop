@@ -166,6 +166,7 @@ def setup_world():
     h = 200
     bodyx = window.width // 2
     bodyy = floorHeight + h + h/8 + 10 
+    print("Body start", bodyx, bodyy)
     global character
     character = Character(space, bodyx, bodyy, 100, 200)
 
