@@ -33,8 +33,8 @@ class Character:
                        load_sprite("bhead.png", head)]
 
         create_joint(space, torso,  head,   bodyx,       bodyy+h*3/4, -math.pi/10,  math.pi/10)
-        create_joint(space, torso,  thighL, bodyx-w/4,   bodyy      , -math.pi*3/4, math.pi/2)
-        create_joint(space, torso,  thighR, bodyx+w/4,   bodyy      , -math.pi*3/4, math.pi/2)
+        create_joint(space, torso,  thighL, bodyx-w/4,   bodyy      , -math.pi/10, math.pi/2)
+        create_joint(space, torso,  thighR, bodyx+w/4,   bodyy      , -math.pi/10, math.pi/2)
         create_joint(space, thighL, calfL,  bodyx-w/4.0, bodyy-h/2.0, -math.pi/2,  -math.pi/3)
         create_joint(space, thighR, calfR,  bodyx+w/4.0, bodyy-h/2.0, -math.pi/2,  -math.pi/3)
         create_joint(space, calfL,  footL,  bodyx-w/4.0, bodyy-h    , -math.pi/10,  math.pi/10)
@@ -143,7 +143,7 @@ def create_joint(space, b1, b2, px, py, lim1, lim2):
     b1_b2.collide_bodies = False
     space.add(b1_b2)
 
-    b1_b2_limit = pymunk.RotaryLimitJoint(b1, b2, -math.pi/10, math.pi/10)
+    b1_b2_limit = pymunk.RotaryLimitJoint(b1, b2, lim1, lim2)
     space.add(b1_b2_limit)
     return b1_b2
 
