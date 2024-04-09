@@ -63,7 +63,8 @@ class Character:
     def draw(self):
         for graphic in self.bodies:
             offset = rotate(graphic.body.angle, graphic.offset)
-            graphic.position = graphic.body.position + offset
+            pos = graphic.body.position + offset # TODO DCJ
+            graphic.position = (pos.x, pos.y, 0)
             graphic.rotation = -graphic.body.angle * 180 / math.pi
             graphic.draw()
 
@@ -157,7 +158,7 @@ def setup_body(space, centerx, centery, mass, width, height, collisionType, grou
     moment = pymunk.moment_for_box(mass, (width, height))
     body = pymunk.Body(mass, moment)
     body.position = centerx, centery
-    body.start_position = Vec2d(body.position)
+    body.start_position = Vec2d(*body.position)
     body.start_angle = 0
     body.width = width
     body.height = height
@@ -180,3 +181,4 @@ def load_sprite(name, body, offset=(0,0)):
     sprite.body = body
     sprite.offset = offset
     return sprite
+
